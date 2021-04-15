@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"dictio-scrapper/model"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -8,7 +9,7 @@ import (
 
 // ListParser Data type for words list file parsing
 type ListParser interface {
-	Parse(string) []string
+	Parse(string) []model.Word
 }
 
 // ListParserImpl Implementation of words list parser type
@@ -22,8 +23,8 @@ func NewListParser() ListParser {
 }
 
 // Parse function to parse list of words from html string
-func (p ListParserImpl) Parse(content string) []string {
-	result := []string{}
+func (p ListParserImpl) Parse(content string) []model.Word {
+	result := []model.Word{}
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(content))
 	if err != nil {
 		return result
@@ -35,7 +36,13 @@ func (p ListParserImpl) Parse(content string) []string {
 		word := wordsList[len(wordsList)-1]
 		word = strings.Trim(word, "\n")
 		if len(word) > 3 {
-			result = append(result, word)
+			url, _ := node.Attr("href")
+			url = strings.Trim(url, "\n")
+			wordObject := model.Word{
+				Name: word,
+				URL:  url,
+			}
+			result = append(result, wordObject)
 		}
 	})
 

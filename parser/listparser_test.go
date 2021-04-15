@@ -22,9 +22,12 @@ func TestListParser(t *testing.T) {
 
 				Convey("Then the list of words should be parsed", func() {
 					So(len(result), ShouldBeGreaterThan, 20)
-					So(result[0], ShouldEqual, "aarónico")
-					So(result[1], ShouldEqual, "aaronita")
-					So(result[2], ShouldEqual, "ababa")
+					So(result[0].Name, ShouldEqual, "aarónico")
+					So(result[0].URL, ShouldEqual, "https://dle.rae.es/aarónico")
+					So(result[1].Name, ShouldEqual, "aaronita")
+					So(result[1].URL, ShouldEqual, "https://dle.rae.es/aaronita")
+					So(result[2].Name, ShouldEqual, "ababa")
+					So(result[2].URL, ShouldEqual, "https://dle.rae.es/ababa")
 				})
 			})
 		})
