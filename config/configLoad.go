@@ -8,7 +8,8 @@ import (
 
 // Config - Data type to hold configuration info
 type Config struct {
-	URL string
+	URL      string
+	Alphabet string
 }
 
 // GlobalConfig - Global configuration object
