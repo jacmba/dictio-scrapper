@@ -41,4 +41,21 @@ func TestDefinitionParser(t *testing.T) {
 			})
 		})
 	})
+
+	Convey("Scenario: test word with broken definition", t, func() {
+		file, _ := ioutil.ReadFile("abalada.html")
+		content := string(file)
+
+		Convey("Given a definition parser instance", func() {
+			parser := NewDefinitionParser()
+
+			Convey("When parse method is invoked with file having corrupt definition", func() {
+				result := parser.Parse(content)
+
+				Convey("Then the definition should be empty", func() {
+					So(result, ShouldEqual, "")
+				})
+			})
+		})
+	})
 }

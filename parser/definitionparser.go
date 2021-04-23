@@ -43,7 +43,7 @@ func (p DefinitionParserImpl) Parse(text string) string {
 			content = strings.TrimPrefix(content, definitionPrefix)
 			contentParts := strings.Split(content, ".")
 
-			if len(content) < 2 {
+			if len(contentParts) < 2 {
 				result = ""
 				return
 			}
