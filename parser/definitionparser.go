@@ -7,6 +7,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const definitionPrefix = "Versión electrónica 23.4 del «Diccionario de la lengua española», obra lexicográfica académica por excelencia."
+
 // DefinitionParser type that parses word definitions
 type DefinitionParser interface {
 	Parse(text string) string
@@ -37,7 +39,15 @@ func (p DefinitionParserImpl) Parse(text string) string {
 
 		if name == "description" {
 			content, _ := meta.Attr("content")
+
+			content = strings.TrimPrefix(content, definitionPrefix)
 			contentParts := strings.Split(content, ".")
+
+			if len(content) < 2 {
+				result = ""
+				return
+			}
+
 			result = contentParts[len(contentParts)-2]
 			result = strings.Trim(result, " ")
 		}
