@@ -58,4 +58,21 @@ func TestDefinitionParser(t *testing.T) {
 			})
 		})
 	})
+
+	Convey("Scenerio: test word with short definition", t, func() {
+		file, _ := ioutil.ReadFile("aba.html")
+		content := string(file)
+
+		Convey("Given a definition parser instance", func() {
+			parser := NewDefinitionParser()
+
+			Convey("When parse method is invoked with file having short definition", func() {
+				result := parser.Parse(content)
+
+				Convey("Then the definition should be empty", func() {
+					So(result, ShouldEqual, "")
+				})
+			})
+		})
+	})
 }

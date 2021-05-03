@@ -50,6 +50,11 @@ func (p DefinitionParserImpl) Parse(text string) string {
 
 			result = contentParts[len(contentParts)-2]
 			result = strings.Trim(result, " ")
+
+			if len(strings.Split(result, " ")) < 3 {
+				result = ""
+				return
+			}
 		}
 	})
 	return result
