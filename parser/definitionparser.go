@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"regexp"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
@@ -50,6 +51,9 @@ func (p DefinitionParserImpl) Parse(text string) string {
 
 			result = contentParts[len(contentParts)-2]
 			result = strings.Trim(result, " ")
+
+			parenthExp := regexp.MustCompile(`\(.*?\)`)
+			result = parenthExp.ReplaceAllString(result, "")
 
 			if len(strings.Split(result, " ")) < 3 {
 				result = ""

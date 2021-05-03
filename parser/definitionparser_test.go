@@ -75,4 +75,21 @@ func TestDefinitionParser(t *testing.T) {
 			})
 		})
 	})
+
+	Convey("Scenario: test word definition with parentheses", t, func() {
+		file, _ := ioutil.ReadFile("abadiado.html")
+		content := string(file)
+
+		Convey("Given a definition parser instance", func() {
+			parser := NewDefinitionParser()
+
+			Convey("When parse method is invoked with file having definition with parentheses", func() {
+				result := parser.Parse(content)
+
+				Convey("Then definition should not have the part between parentheses", func() {
+					So(result, ShouldEqual, "")
+				})
+			})
+		})
+	})
 }
