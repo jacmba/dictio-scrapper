@@ -34,7 +34,7 @@ func (m MockListParser) Parse(content string) []model.Word {
 	return args.Get(0).([]model.Word)
 }
 
-func (m MockDefinitionParser) Parse(content string) string {
+func (m *MockDefinitionParser) Parse(content string) string {
 	args := m.Called(content)
 	return args.String(0)
 }
@@ -65,6 +65,10 @@ func TestCrawlingProcess(t *testing.T) {
 					//httpGetter.AssertNumberOfCalls(t, "Get", 2)
 					//httpGetter.AssertCalled(t, "Get", "list-A.com")
 					//httpGetter.AssertCalled(t, "Get", "definition.com")
+
+					//listParser.AssertNumberOfCalls(t, "Parse", 1)
+
+					definitionParser.AssertNumberOfCalls(t, "Parse", 1)
 				})
 			})
 		})

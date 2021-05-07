@@ -11,22 +11,15 @@ import (
 const definitionPrefix = "Versión electrónica 23.4 del «Diccionario de la lengua española», obra lexicográfica académica por excelencia."
 
 // DefinitionParser type that parses word definitions
-type DefinitionParser interface {
-	Parse(text string) string
-}
-
-// DefinitionParserImpl Implementation of definition parser type
-type DefinitionParserImpl struct {
-	DefinitionParser
-}
+type DefinitionParser struct{}
 
 // NewDefinitionParser Definition parser constructor
 func NewDefinitionParser() DefinitionParser {
-	return DefinitionParserImpl{}
+	return DefinitionParser{}
 }
 
 // Parse method that parses html and extracts word definition
-func (p DefinitionParserImpl) Parse(text string) string {
+func (p *DefinitionParser) Parse(text string) string {
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(text))
 	if err != nil {
 		logrus.Errorf("Error parsing html: %v", err)
