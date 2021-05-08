@@ -16,6 +16,6 @@ func main() {
 
 	alphabet := strings.Split(config.GlobalConfig.Alphabet, ",")
 
-	c := crawler.New(getter, listParser, definitionParser, alphabet)
+	c := crawler.New(getter, listParser, definitionParser, nil, alphabet)
 	c.Process(config.GlobalConfig.URL)
 }

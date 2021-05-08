@@ -1,7 +1,9 @@
 package crawler
 
 import (
+	"dictio-scrapper/model"
 	"dictio-scrapper/parser"
+	"dictio-scrapper/persistence"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -27,14 +29,16 @@ type CrawlerImpl struct {
 	getter     HttpGetter
 	listParser parser.ListParser
 	wordParser parser.DefinitionParser
+	db         persistence.DB
 	alphabet   []string
 }
 
-func New(getter HttpGetter, listParser parser.ListParser, wordParser parser.DefinitionParser, alphabet []string) Crawler {
+func New(getter HttpGetter, listParser parser.ListParser, wordParser parser.DefinitionParser, db persistence.DB, alphabet []string) Crawler {
 	return CrawlerImpl{
 		getter:     getter,
 		listParser: listParser,
 		wordParser: wordParser,
+		db:         db,
 		alphabet:   alphabet,
 	}
 }
@@ -70,6 +74,17 @@ func (c CrawlerImpl) Process(url string) error {
 			definition := c.wordParser.Parse(definitionContent)
 
 			logrus.Infof("Processed definition of %s: %s", word.Name, definition)
+
+			data := model.Entry{
+				Word:       word.Name,
+				Definition: definition,
+				Letters:    []string{strings.ToLower(word.Name)[0:1]},
+			}
+			err = c.db.Save(data)
+
+			if err != nil {
+				return err
+			}
 		}
 	}
 
