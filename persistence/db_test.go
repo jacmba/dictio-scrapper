@@ -7,13 +7,14 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/stretchr/testify/mock"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type mockClient struct {
 	mock.Mock
 }
 
-func (m *mockClient) Database(name string) Database {
+func (m *mockClient) Database(name string, opt ...*options.DatabaseOptions) Database {
 	args := m.Called(name)
 	return args.Get(0).(Database)
 }
@@ -22,7 +23,7 @@ type mockDb struct {
 	mock.Mock
 }
 
-func (m *mockDb) Collection(name string) Collection {
+func (m *mockDb) Collection(name string, opt ...*options.CollectionOptions) Collection {
 	args := m.Called(name)
 	return args.Get(0).(Collection)
 }
@@ -31,7 +32,7 @@ type mockCollection struct {
 	mock.Mock
 }
 
-func (m *mockCollection) InsertOne(ctx context.Context, data interface{}) (interface{}, error) {
+func (m *mockCollection) InsertOne(ctx context.Context, data interface{}, opt ...*options.InsertOneOptions) (interface{}, error) {
 	args := m.Called(ctx, data)
 	return args.String(0), args.Error(1)
 }

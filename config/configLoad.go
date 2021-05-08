@@ -11,6 +11,7 @@ type Config struct {
 	URL      string
 	Alphabet string
 	MongoURL string
+	Database string
 }
 
 // GlobalConfig - Global configuration object

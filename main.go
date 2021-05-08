@@ -5,6 +5,7 @@ import (
 	"dictio-scrapper/config"
 	"dictio-scrapper/crawler"
 	"dictio-scrapper/parser"
+	"dictio-scrapper/persistence"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -34,6 +35,12 @@ func main() {
 	if err != nil {
 		logrus.Fatalf("Cannot reach database: %v", err)
 	}
+
+	defer client.Disconnect(context.TODO())
+
+	logrus.Info("Successfully connected to database")
+
+	db := persistence.New(client, config.GlobalConfig.Database)
 
 	c := crawler.New(getter, listParser, definitionParser, nil, alphabet)
 	c.Process(config.GlobalConfig.URL)

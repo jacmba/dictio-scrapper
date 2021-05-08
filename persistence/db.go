@@ -5,6 +5,7 @@ import (
 	"dictio-scrapper/model"
 
 	"github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type DB interface {
@@ -12,15 +13,15 @@ type DB interface {
 }
 
 type Client interface {
-	Database(name string) Database
+	Database(name string, opts ...*options.DatabaseOptions) *Database
 }
 
 type Database interface {
-	Collection(name string) Collection
+	Collection(name string, opts ...*options.CollectionOptions) *Collection
 }
 
 type Collection interface {
-	InsertOne(ctx context.Context, data interface{}) (interface{}, error)
+	InsertOne(ctx context.Context, data interface{}, opt ...*options.InsertOneOptions) (*interface{}, error)
 }
 
 type DBImpl struct {
