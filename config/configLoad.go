@@ -10,6 +10,7 @@ import (
 type Config struct {
 	URL      string
 	Alphabet string
+	MongoURL string
 }
 
 // GlobalConfig - Global configuration object

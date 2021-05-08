@@ -24,19 +24,18 @@ type Collection interface {
 }
 
 type DBImpl struct {
-	client     Client
-	database   string
-	collection string
+	client   Client
+	database string
 }
 
-func New(client Client, database, collection string) DBImpl {
-	return DBImpl{client, database, collection}
+func New(client Client, database string) DBImpl {
+	return DBImpl{client, database}
 }
 
 func (db DBImpl) Save(entry model.Entry) error {
 	res, err := db.client.
 		Database(db.database).
-		Collection(db.collection).
+		Collection(entry.Letters[0]).
 		InsertOne(context.TODO(), entry)
 
 	logrus.Infof("Inserted record %v on DB: %v", entry, res)

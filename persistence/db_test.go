@@ -43,24 +43,24 @@ func TestDBStorage(t *testing.T) {
 		collection := new(mockCollection)
 
 		client.On("Database", "myDb").Return(database)
-		database.On("Collection", "myCollection").Return(collection)
+		database.On("Collection", "f").Return(collection)
 		collection.On("InsertOne", mock.AnythingOfType("*context.emptyCtx"), mock.AnythingOfType("model.Entry")).Return("ok", nil)
 
 		Convey("Given a DB instance", func() {
-			db := New(client, "myDb", "myCollection")
+			db := New(client, "myDb")
 
 			Convey("When Save method is called", func() {
 				data := model.Entry{
 					Word:       "foo",
 					Definition: "lorem ipsum dolor sit amet",
-					Letters:    []string{"F"},
+					Letters:    []string{"f"},
 				}
 				err := db.Save(data)
 
 				Convey("Then should be no errors and DB methods must be invoked", func() {
 					So(err, ShouldBeNil)
 					client.AssertCalled(t, "Database", "myDb")
-					database.AssertCalled(t, "Collection", "myCollection")
+					database.AssertCalled(t, "Collection", "f")
 					collection.AssertCalled(t, "InsertOne", mock.AnythingOfType("*context.emptyCtx"), data)
 				})
 			})
