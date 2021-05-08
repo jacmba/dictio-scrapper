@@ -1,23 +1,45 @@
 package persistence
 
 import (
+	"context"
 	"dictio-scrapper/model"
 
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/sirupsen/logrus"
 )
 
 type DB interface {
 	Save(entry model.Entry) error
 }
 
-type DBImpl struct {
-	client mongo.Client
+type Client interface {
+	Database(name string) Database
 }
 
-func New(client mongo.Client) DBImpl {
-	return DBImpl{client}
+type Database interface {
+	Collection(name string) Collection
+}
+
+type Collection interface {
+	InsertOne(ctx context.Context, data interface{}) (interface{}, error)
+}
+
+type DBImpl struct {
+	client     Client
+	database   string
+	collection string
+}
+
+func New(client Client, database, collection string) DBImpl {
+	return DBImpl{client, database, collection}
 }
 
 func (db DBImpl) Save(entry model.Entry) error {
-	return nil
+	res, err := db.client.
+		Database(db.database).
+		Collection(db.collection).
+		InsertOne(context.TODO(), entry)
+
+	logrus.Infof("Inserted record %v on DB: %v", entry, res)
+
+	return err
 }
