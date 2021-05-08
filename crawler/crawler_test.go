@@ -2,48 +2,45 @@ package crawler
 
 import (
 	"dictio-scrapper/model"
-	"dictio-scrapper/parser"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
 	"github.com/stretchr/testify/mock"
 )
 
-type MockTTP struct {
+type mockTTP struct {
 	mock.Mock
 	HttpGetter
 }
 
-type MockListParser struct {
+type mockListParser struct {
 	mock.Mock
-	parser.ListParser
 }
 
-type MockDefinitionParser struct {
+type mockDefinitionParser struct {
 	mock.Mock
-	parser.DefinitionParser
 }
 
-func (m MockTTP) Get(url string) (string, error) {
+func (m *mockTTP) Get(url string) (string, error) {
 	args := m.Called(url)
 	return args.String(0), args.Error(1)
 }
 
-func (m MockListParser) Parse(content string) []model.Word {
+func (m *mockListParser) Parse(content string) []model.Word {
 	args := m.Called(content)
 	return args.Get(0).([]model.Word)
 }
 
-func (m *MockDefinitionParser) Parse(content string) string {
+func (m *mockDefinitionParser) Parse(content string) string {
 	args := m.Called(content)
 	return args.String(0)
 }
 
 func TestCrawlingProcess(t *testing.T) {
 	Convey("Scenario: test crawling process", t, func() {
-		httpGetter := MockTTP{}
-		listParser := MockListParser{}
-		definitionParser := MockDefinitionParser{}
+		httpGetter := new(mockTTP)
+		listParser := new(mockListParser)
+		definitionParser := new(mockDefinitionParser)
 
 		httpGetter.On("Get", "list-A.com").Return("<html>words list</html>", nil)
 		httpGetter.On("Get", "definition.com").Return("<html>word definition</html>", nil)
@@ -62,13 +59,15 @@ func TestCrawlingProcess(t *testing.T) {
 
 				Convey("Then crawling is executed", func() {
 					So(err, ShouldBeNil)
-					//httpGetter.AssertNumberOfCalls(t, "Get", 2)
-					//httpGetter.AssertCalled(t, "Get", "list-A.com")
-					//httpGetter.AssertCalled(t, "Get", "definition.com")
+					httpGetter.AssertNumberOfCalls(t, "Get", 2)
+					httpGetter.AssertCalled(t, "Get", "list-A.com")
+					httpGetter.AssertCalled(t, "Get", "definition.com")
 
-					//listParser.AssertNumberOfCalls(t, "Parse", 1)
+					listParser.AssertNumberOfCalls(t, "Parse", 1)
+					listParser.AssertCalled(t, "Parse", "<html>words list</html>")
 
 					definitionParser.AssertNumberOfCalls(t, "Parse", 1)
+					definitionParser.AssertCalled(t, "Parse", "<html>word definition</html>")
 				})
 			})
 		})
