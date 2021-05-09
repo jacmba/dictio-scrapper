@@ -37,7 +37,7 @@ func TestApplicationIntegration(t *testing.T) {
 		col := client.Database("dictio").Collection("a")
 		count, err := col.CountDocuments(context.TODO(), bson.D{})
 
-		So(count, ShouldBeGreaterThan, 3)
+		So(count, ShouldBeGreaterThan, 100)
 
 		Convey("No word should have an empty definition", func() {
 			cursor, err := col.Find(context.TODO(), bson.D{})

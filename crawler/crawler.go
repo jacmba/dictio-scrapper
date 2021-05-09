@@ -63,9 +63,18 @@ func (c CrawlerImpl) Process(url string) error {
 		logrus.Infof("Parsed %d words with letter %s", len(list), letter)
 
 		for _, word := range list {
-			logrus.Infof("Parsing definition for word [%s]", word.Name)
+			logrus.Infof("Parsing definition for word [%s] from %s", word.Name, word.URL)
+
+			urlParts := strings.Split(word.URL, " ")
+
+			if len(urlParts) > 1 {
+				logrus.Infof("Discarding invalid URL for %s: %s", word.Name, word.URL)
+				continue
+			}
 
 			definitionContent, err := c.getter.Get(word.URL)
+
+			logrus.Infof("Content returned from URL: %s", definitionContent)
 
 			if err != nil {
 				return fmt.Errorf("Error getting data from %s: %s", word.URL, err)

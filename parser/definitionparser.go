@@ -34,10 +34,18 @@ func (p DefinitionParserImpl) Parse(text string) string {
 	var result string
 
 	doc.Find("meta").Each(func(_ int, meta *goquery.Selection) {
-		name, _ := meta.Attr("name")
+		name, exists := meta.Attr("name")
+
+		if !exists {
+			return
+		}
 
 		if name == "description" {
-			content, _ := meta.Attr("content")
+			content, exists := meta.Attr("content")
+
+			if !exists {
+				return
+			}
 
 			content = strings.TrimPrefix(content, definitionPrefix)
 			contentParts := strings.Split(content, ".")
