@@ -4,6 +4,7 @@ package test
 
 import (
 	"context"
+	"dictio-scrapper/model"
 	"testing"
 
 	"github.com/sirupsen/logrus"
@@ -15,7 +16,7 @@ import (
 
 func TestApplicationIntegration(t *testing.T) {
 	Convey("Scenario: test application behavior", t, func() {
-		opt := options.Client().ApplyURI("mongodb://mongo:27017")
+		opt := options.Client().ApplyURI("mongodb://localhost:37777")
 		client, err := mongo.Connect(context.TODO(), opt)
 
 		So(err, ShouldBeNil)
@@ -24,7 +25,7 @@ func TestApplicationIntegration(t *testing.T) {
 
 		logrus.Info("Connected to MongoDB. Checking ping...")
 		err = client.Ping(context.TODO(), nil)
-		So(err, ShouldNotBeNil)
+		So(err, ShouldBeNil)
 
 		logrus.Info("Ping suceeded. Checking available databases...")
 		dbs, err := client.ListDatabaseNames(context.TODO(), bson.D{})
@@ -37,5 +38,17 @@ func TestApplicationIntegration(t *testing.T) {
 		count, err := col.CountDocuments(context.TODO(), bson.D{})
 
 		So(count, ShouldBeGreaterThan, 3)
+
+		Convey("No word should have an empty definition", func() {
+			cursor, err := col.Find(context.TODO(), bson.D{})
+
+			So(err, ShouldBeNil)
+
+			for run := true; run; run = cursor.Next(context.TODO()) {
+				var data model.Entry
+				cursor.Decode(data)
+				So(len(data.Definition), ShouldBeGreaterThan, 1)
+			}
+		})
 	})
 }
