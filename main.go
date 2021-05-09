@@ -40,8 +40,9 @@ func main() {
 
 	logrus.Info("Successfully connected to database")
 
-	db := persistence.New(client, config.GlobalConfig.Database)
+	wrapper := persistence.NewWrapper(client)
+	db := persistence.New(wrapper, config.GlobalConfig.Database)
 
-	c := crawler.New(getter, listParser, definitionParser, nil, alphabet)
+	c := crawler.New(getter, listParser, definitionParser, db, alphabet)
 	c.Process(config.GlobalConfig.URL)
 }
