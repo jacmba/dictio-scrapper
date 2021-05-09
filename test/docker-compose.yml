@@ -1,0 +1,22 @@
+version: "2"
+
+services:
+  mongo:
+    container_name: test_mongo
+    image: mongo
+    networks:
+      - test_network
+
+  dictio-scrapper:
+    container_name: test_dictio-scrapper
+    build: ..
+    depends_on:
+      - mongo
+    networks:
+      - test_network
+    environment:
+      MONGOURL: mongodb://mongo:27017
+      ALPHABET: "A"
+
+networks:
+  test_network:
