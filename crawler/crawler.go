@@ -73,17 +73,21 @@ func (c CrawlerImpl) Process(url string) error {
 
 			definition := c.wordParser.Parse(definitionContent)
 
-			logrus.Infof("Processed definition of %s: %s", word.Name, definition)
+			if len(definition) > 0 {
+				logrus.Infof("Processed definition of %s: %s", word.Name, definition)
 
-			data := model.Entry{
-				Word:       word.Name,
-				Definition: definition,
-				Letters:    []string{strings.ToLower(word.Name)[0:1]},
-			}
-			err = c.db.Save(data)
+				data := model.Entry{
+					Word:       word.Name,
+					Definition: definition,
+					Letters:    []string{strings.ToLower(word.Name)[0:1]},
+				}
+				err = c.db.Save(data)
 
-			if err != nil {
-				return err
+				if err != nil {
+					return err
+				}
+			} else {
+				logrus.Infof("Discarding word [%s] with empty definition", word)
 			}
 		}
 	}

@@ -44,9 +44,11 @@ func TestApplicationIntegration(t *testing.T) {
 
 			So(err, ShouldBeNil)
 
-			for run := true; run; run = cursor.Next(context.TODO()) {
+			for cursor.Next(context.TODO()) {
 				var data model.Entry
-				cursor.Decode(data)
+				raw := cursor.Current
+				bson.Unmarshal(raw, &data)
+				logrus.Infof("Checking word %s", data.Word)
 				So(len(data.Definition), ShouldBeGreaterThan, 1)
 			}
 		})
