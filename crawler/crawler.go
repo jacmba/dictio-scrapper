@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/sirupsen/logrus"
 )
@@ -74,8 +75,6 @@ func (c CrawlerImpl) Process(url string) error {
 
 			definitionContent, err := c.getter.Get(word.URL)
 
-			logrus.Infof("Content returned from URL: %s", definitionContent)
-
 			if err != nil {
 				return fmt.Errorf("Error getting data from %s: %s", word.URL, err)
 			}
@@ -85,10 +84,14 @@ func (c CrawlerImpl) Process(url string) error {
 			if len(definition) > 0 {
 				logrus.Infof("Processed definition of %s: %s", word.Name, definition)
 
+				letters := []string{getLetter(strings.ToLower(word.Name))}
+
+				logrus.Info(letters)
+
 				data := model.Entry{
 					Word:       word.Name,
 					Definition: definition,
-					Letters:    []string{strings.ToLower(word.Name)[0:1]},
+					Letters:    letters,
 				}
 				err = c.db.Save(data)
 
@@ -102,6 +105,22 @@ func (c CrawlerImpl) Process(url string) error {
 	}
 
 	return nil
+}
+
+func getLetter(s string) string {
+	letter := s[0:1]
+	if utf8.ValidString(letter) {
+		return string(letter[0])
+	} else {
+		tildeMap := map[byte]string{
+			"á"[1]: "a",
+			"é"[1]: "e",
+			"í"[1]: "i",
+			"ó"[1]: "o",
+			"ú"[1]: "u",
+		}
+		return tildeMap[s[1]]
+	}
 }
 
 func (h HttpGetterImpl) Get(url string) (string, error) {

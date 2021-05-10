@@ -91,4 +91,50 @@ func TestCrawlingProcess(t *testing.T) {
 			})
 		})
 	})
+
+	Convey("Scenario: test crawling process with special initial letter", t, func() {
+		httpGetter := new(mockTTP)
+		listParser := new(mockListParser)
+		definitionParser := new(mockDefinitionParser)
+		db := new(mockDb)
+
+		httpGetter.On("Get", "list-A.com").Return("<html>words list</html>", nil)
+		httpGetter.On("Get", "definition.com").Return("<html>word definition</html>", nil)
+
+		listParser.On("Parse", "<html>words list</html>").Return([]model.Word{
+			model.Word{Name: "ámbar", URL: "definition.com"},
+		})
+
+		definitionParser.On("Parse", "<html>word definition</html>").Return("lorem ipsum dolor sit amet")
+
+		db.On("Save", mock.AnythingOfType("model.Entry")).Return(nil)
+
+		Convey("Given a crawler instance", func() {
+			instance := New(httpGetter, listParser, definitionParser, db, []string{"A"})
+
+			Convey("When crawling process is invoked", func() {
+				err := instance.Process("list-${LETTER}.com")
+
+				Convey("Then crawling is executed", func() {
+					So(err, ShouldBeNil)
+					httpGetter.AssertNumberOfCalls(t, "Get", 2)
+					httpGetter.AssertCalled(t, "Get", "list-A.com")
+					httpGetter.AssertCalled(t, "Get", "definition.com")
+
+					listParser.AssertNumberOfCalls(t, "Parse", 1)
+					listParser.AssertCalled(t, "Parse", "<html>words list</html>")
+
+					definitionParser.AssertNumberOfCalls(t, "Parse", 1)
+					definitionParser.AssertCalled(t, "Parse", "<html>word definition</html>")
+
+					db.AssertNumberOfCalls(t, "Save", 1)
+					db.AssertCalled(t, "Save", model.Entry{
+						Word:       "ámbar",
+						Definition: "lorem ipsum dolor sit amet",
+						Letters:    []string{"a"},
+					})
+				})
+			})
+		})
+	})
 }
