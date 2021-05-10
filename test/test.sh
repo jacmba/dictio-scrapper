@@ -11,9 +11,9 @@ docker-compose logs dictio-scrapper
 echo "Starting tests execution"
 go test -v -tags=integration
 
-if [ "$?" -ne "0"]; then
+if [ $? -ne "0"]; then
   echo "Tests execution failed"
-  exit ${1}
+  exit $?
 fi
 
 echo "Tests execution complete. Tear down test environment..."
