@@ -28,6 +28,12 @@ func TestListParser(t *testing.T) {
 					So(result[1].URL, ShouldEqual, "https://dle.rae.es/aaronita")
 					So(result[2].Name, ShouldEqual, "ababa")
 					So(result[2].URL, ShouldEqual, "https://dle.rae.es/ababa")
+
+					Convey("And it should not contain conjugation words", func() {
+						for _, r := range result {
+							So(r.Name, ShouldNotEqual, "ababilla")
+						}
+					})
 				})
 			})
 		})

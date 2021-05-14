@@ -7,6 +7,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+const (
+	WORDS_SECTION = "#columna_resultados_generales"
+	WORD_BLOCK    = "#palabra_resultado"
+)
+
 // ListParser Data type for words list file parsing
 type ListParser interface {
 	Parse(string) []model.Word
@@ -30,7 +35,9 @@ func (p ListParserImpl) Parse(content string) []model.Word {
 		return result
 	}
 
-	doc.Find("#palabra_resultado").Each(func(_ int, node *goquery.Selection) {
+	words := doc.Find(WORDS_SECTION).First()
+
+	words.Find(WORD_BLOCK).Each(func(_ int, node *goquery.Selection) {
 		title, _ := node.Attr("title")
 		wordsList := strings.Split(title, " ")
 		word := wordsList[len(wordsList)-1]
