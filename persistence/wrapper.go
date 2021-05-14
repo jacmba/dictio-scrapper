@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -34,4 +35,19 @@ func (d DbWrapper) Collection(name string) Collection {
 
 func (c CollectionWrapper) InsertOne(ctx context.Context, data interface{}) (interface{}, error) {
 	return c.col.InsertOne(ctx, data)
+}
+
+func (c CollectionWrapper) Upsert(ctx context.Context, data interface{}) interface{} {
+	upsert := bson.D{{"$set", data}}
+	err := c.col.FindOneAndUpdate(ctx, bson.D{}, upsert).Decode(&bson.M{})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c CollectionWrapper) FindOne(ctx context.Context, data interface{}) interface{} {
+	return c.col.FindOne(ctx, bson.D{}).Decode(data)
 }

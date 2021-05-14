@@ -21,9 +21,13 @@ func TestWrapperType(t *testing.T) {
 		dbRes := wrapper.Database("anyDb")
 		colRes := db.Collection("anyCol")
 		_, err := col.InsertOne(context.TODO(), bson.M{})
+		upRes := col.Upsert(context.TODO(), bson.M{})
+		findRes := col.FindOne(context.TODO(), bson.M{})
 
 		So(dbRes, ShouldBeNil)
 		So(colRes, ShouldBeNil)
 		So(err, ShouldNotBeNil)
+		So(upRes, ShouldNotBeNil)
+		So(findRes, ShouldNotBeNil)
 	})
 }

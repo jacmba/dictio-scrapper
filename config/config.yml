@@ -1,4 +1,4 @@
-URL: "https://www.listapalabras.com/palabras-con-${LETTER}-lista-completa.php"
+URL: "https://www.listapalabras.com/palabras-con.php?letra=${LETTER}&total=s"
 # URL: "https://www.listapalabras.com/palabras-con.php?letra=${LETTER}"
 
 ALPHABET: "A,B,C,D,E,F,G,H,I,J,L,M,N,O,P,Q,R,S,T,U,V,Y,Z"

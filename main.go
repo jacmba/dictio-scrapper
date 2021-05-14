@@ -6,6 +6,7 @@ import (
 	"dictio-scrapper/crawler"
 	"dictio-scrapper/parser"
 	"dictio-scrapper/persistence"
+	"os"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -44,5 +45,10 @@ func main() {
 	db := persistence.New(wrapper, config.GlobalConfig.Database)
 
 	c := crawler.New(getter, listParser, definitionParser, db, alphabet)
-	c.Process(config.GlobalConfig.URL)
+	err = c.Process(config.GlobalConfig.URL)
+
+	if err != nil {
+		logrus.Errorf("Error on crawling process: %v", err)
+		os.Exit(-1)
+	}
 }

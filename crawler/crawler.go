@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 	"unicode/utf8"
 
 	"github.com/sirupsen/logrus"
@@ -49,7 +50,21 @@ func (c CrawlerImpl) Process(url string) error {
 	logrus.Info("= Starting crawler process                       =")
 	logrus.Info("==================================================")
 
+	status, err := c.db.LoadStatus()
+	if err != nil {
+		return err
+	}
+
+	logrus.Infof("Last saved status: %v", status)
+	letterFound := false
+
 	for _, letter := range c.alphabet {
+		if !letterFound && status.Letter != "" && status.Letter != letter {
+			continue
+		}
+		letterFound = true
+		status.Letter = letter
+
 		logrus.Infof("Processing letter [%s]", letter)
 		uri := strings.Replace(url, "${LETTER}", letter, -1)
 
@@ -63,7 +78,20 @@ func (c CrawlerImpl) Process(url string) error {
 		list := c.listParser.Parse(listContent)
 		logrus.Infof("Parsed %d words with letter %s", len(list), letter)
 
+		wordFound := false
+
 		for _, word := range list {
+			if !wordFound {
+				if status.Word == "" || status.Word == word.Name {
+					wordFound = true
+					if status.Word == word.Name {
+						continue
+					}
+				} else {
+					continue
+				}
+			}
+
 			logrus.Infof("Parsing definition for word [%s] from %s", word.Name, word.URL)
 
 			urlParts := strings.Split(word.URL, " ")
@@ -101,8 +129,21 @@ func (c CrawlerImpl) Process(url string) error {
 			} else {
 				logrus.Infof("Discarding word [%s] with empty definition", word)
 			}
+
+			status.Word = word.Name
+			status.Timestamp = time.Now().UTC().Format(time.RFC3339)
+			err = c.db.SaveStatus(status)
+			if err != nil {
+				return err
+			}
 		}
+
+		status.Word = ""
 	}
+
+	logrus.Info("==================================================")
+	logrus.Info("= Finished crawler process                       =")
+	logrus.Info("==================================================")
 
 	return nil
 }

@@ -45,6 +45,16 @@ func (m *mockDb) Save(data model.Entry) error {
 	return args.Error(0)
 }
 
+func (m *mockDb) SaveStatus(status model.Status) error {
+	args := m.Called(status)
+	return args.Error(0)
+}
+
+func (m *mockDb) LoadStatus() (model.Status, error) {
+	args := m.Called()
+	return args.Get(0).(model.Status), args.Error(1)
+}
+
 func TestCrawlingProcess(t *testing.T) {
 	Convey("Scenario: test crawling process", t, func() {
 		httpGetter := new(mockTTP)
@@ -61,7 +71,14 @@ func TestCrawlingProcess(t *testing.T) {
 
 		definitionParser.On("Parse", "<html>word definition</html>").Return("lorem ipsum dolor sit amet")
 
+		mockStatus := model.Status{
+			Letter:    "P",
+			Word:      "pataliebre",
+			Timestamp: "long time ago",
+		}
 		db.On("Save", mock.AnythingOfType("model.Entry")).Return(nil)
+		db.On("SaveStatus", mock.AnythingOfType("model.Status")).Return(nil)
+		db.On("LoadStatus").Return(mockStatus, nil)
 
 		Convey("Given a crawler instance", func() {
 			instance := New(httpGetter, listParser, definitionParser, db, []string{"A"})
@@ -87,6 +104,10 @@ func TestCrawlingProcess(t *testing.T) {
 						Definition: "lorem ipsum dolor sit amet",
 						Letters:    []string{"f"},
 					})
+					db.AssertCalled(t, "LoadStatus")
+					db.AssertCalled(t, "SaveStatus", mock.MatchedBy(func(status model.Status) bool {
+						return status.Letter == "A" && status.Word == "foo"
+					}))
 				})
 			})
 		})
@@ -108,6 +129,8 @@ func TestCrawlingProcess(t *testing.T) {
 		definitionParser.On("Parse", "<html>word definition</html>").Return("lorem ipsum dolor sit amet")
 
 		db.On("Save", mock.AnythingOfType("model.Entry")).Return(nil)
+		db.On("SaveStatus", mock.AnythingOfType("model.Status")).Return(nil)
+		db.On("LoadStatus").Return(model.Status{}, nil)
 
 		Convey("Given a crawler instance", func() {
 			instance := New(httpGetter, listParser, definitionParser, db, []string{"A"})
